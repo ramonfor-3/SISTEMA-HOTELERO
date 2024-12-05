@@ -1,0 +1,65 @@
+﻿@model IEnumerable<SISTEMA_HOTELERO.Models.Booking>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Reservar habitacion</h1>
+
+<p>
+    <a asp-action="Create">Crear una reserva</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+@*             <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th> *@
+            <th>
+                Desde
+            </th>
+            <th>
+                Hasta
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Estado
+            </th>
+            <th>
+                Habitacion
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            @* <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+ *@            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Property.Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detalle</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
