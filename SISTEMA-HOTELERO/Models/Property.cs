@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SISTEMA_HOTELERO.Models
 {
@@ -11,8 +12,6 @@ namespace SISTEMA_HOTELERO.Models
         public int Capacity { get; set; }
         public decimal PricePerNight { get; set; }
         public PropertyStatus Status { get; set; }
-        public int OwnerId { get; set; }
-
         public IdentityUser Owner { get; set; }
         public ICollection<Room> Rooms { get; set; }
         public ICollection<Booking> Bookings { get; set; }

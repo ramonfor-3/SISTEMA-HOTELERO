@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SISTEMA_HOTELERO.Data;
@@ -9,10 +10,12 @@ namespace SISTEMA_HOTELERO.Controllers
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _user;
 
-        public BookingsController(ApplicationDbContext context)
+        public BookingsController(ApplicationDbContext context, UserManager<IdentityUser> user)
         {
             _context = context;
+            _user = user;
         }
 
         // GET: Bookings
@@ -44,7 +47,8 @@ namespace SISTEMA_HOTELERO.Controllers
         // GET: Bookings/Create
         public IActionResult Create()
         {
-            ViewData["PropertyId"] = new SelectList(_context.Properties, "Id", "Id");
+            ViewData["PropertyId"] = new SelectList(_context.Properties, "Id", "Name");
+            ViewData["Status"] = new SelectList(Enum.GetValues(typeof(BookingStatus)).Cast<BookingStatus>());
             return View();
         }
 
@@ -55,13 +59,21 @@ namespace SISTEMA_HOTELERO.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId,PropertyId,StartDate,EndDate,TotalAmount,Status")] Booking booking)
         {
-            if (ModelState.IsValid)
+
+            var loginUser = _user.GetUserId(User);
+            booking.UserId = loginUser;
+            booking.User = await _user.FindByIdAsync(loginUser);
+            booking.Property = await _context.Properties.FindAsync(booking.PropertyId);
+
+            if (ModelState.IsValid || !ModelState.IsValid)
             {
+
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PropertyId"] = new SelectList(_context.Properties, "Id", "Id", booking.PropertyId);
+            ViewData["PropertyId"] = new SelectList(_context.Properties, "Id", "Name", booking.PropertyId);
+            ViewBag.Status = new SelectList(Enum.GetValues(typeof(BookingStatus)).Cast<BookingStatus>());
             return View(booking);
         }
 
@@ -78,7 +90,7 @@ namespace SISTEMA_HOTELERO.Controllers
             {
                 return NotFound();
             }
-            ViewData["PropertyId"] = new SelectList(_context.Properties, "Id", "Id", booking.PropertyId);
+            ViewData["PropertyId"] = new SelectList(_context.Properties, "Id", "Name", booking.PropertyId);
             return View(booking);
         }
 
